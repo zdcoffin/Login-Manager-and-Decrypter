@@ -36,7 +36,7 @@ def add_are_you_sure_yes():
     new_username = add_frame_username_entry.get()
     new_password = add_frame_password_entry.get()
     new_login = [new_service, new_username, new_password]
-    with open('test_login_info.csv', 'a', newline='') as login_file:
+    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'a', newline='') as login_file:
         csv_writer = csv.writer(login_file)
         csv_writer.writerow(new_login)
     add_frame_service_entry.delete(0, tk.END)
@@ -67,7 +67,7 @@ def add_are_you_sure_no():
 def delete_login_from_csv(service_to_delete):
     
     stored_logins = []
-    with open('test_login_info.csv', 'r', newline='') as login_file:
+    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r', newline='') as login_file:
         csv_read = csv.reader(login_file)
         for row in csv_read:
             stored_logins.append(row)
@@ -80,13 +80,13 @@ def delete_login_from_csv(service_to_delete):
         else:
             new_logins.append(row)
 
-    with open('test_login_info.csv', 'w', newline='') as login_file:
+    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'w', newline='') as login_file:
         csv_writer = csv.writer(login_file)
         csv_writer.writerows(new_logins)
     
 
 def get_service_list():
-    with open('test_login_info.csv', 'r') as login_file:
+    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r') as login_file:
         corrected_login_file = csv.reader(login_file)
 
         login_list = []
@@ -100,7 +100,7 @@ def get_service_list():
 
 
 def generate_info_button_commmand():
-    with open('test_login_info.csv', 'r') as login_file:
+    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r') as login_file:
         corrected_login_file = csv.reader(login_file)
         login_list = []
         for line in corrected_login_file:
@@ -121,6 +121,7 @@ def return_to_title_screen():
     retrieve_frame.grid_remove()
     add_frame.grid_remove()
     delete_frame.grid_remove()
+    update_frame.grid_remove()
     checkbox_frame.pack()
 
 
@@ -137,6 +138,9 @@ def checkbox_button_command():
     elif delete_var.get() == 1:
         checkbox_frame.pack_forget()
         delete_frame.grid()
+    elif update_var.get() == 1:
+        checkbox_frame.pack_forget()
+        update_frame.grid()
 
 
 def delete_login_from_csv():
@@ -144,7 +148,7 @@ def delete_login_from_csv():
     service_to_delete = delete_frame_selected_service.get()
 
     stored_logins = []
-    with open('test_login_info.csv', 'r', newline='') as login_file:
+    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r', newline='') as login_file:
         csv_read = csv.reader(login_file)
         for row in csv_read:
             stored_logins.append(row)
@@ -157,7 +161,7 @@ def delete_login_from_csv():
         else:
             new_logins.append(row)
 
-    with open('test_login_info.csv', 'w', newline='') as login_file:
+    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'w', newline='') as login_file:
         csv_writer = csv.writer(login_file)
         csv_writer.writerows(new_logins)
 
@@ -176,6 +180,65 @@ def delete_no_go_back():
     delete_frame_are_you_sure.grid_forget()
     delete_frame_no_button.grid_forget()
     delete_frame_yes_button.grid_forget()
+
+
+def update_button():
+    update_frame_correct_label.grid(row=8, column=1)
+    update_frame_confirm_label.grid(row=9, column=1)
+    update_frame_yes_button.grid(row=10, column=1)
+    update_frame_no_button.grid(row=11, column=1)
+
+    update_frame_confirm_label['text'] = 'New ' + update_frame_what_combobox.get() + ': ' + update_frame_new_entry.get()
+
+
+def update_no_button():
+    update_frame_correct_label.grid_remove()
+    update_frame_confirm_label.grid_remove()
+    update_frame_yes_button.grid_remove()
+    update_frame_no_button.grid_remove()
+
+
+def update_yes_button():
+
+    stored_logins = []
+
+    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r', newline='') as login_file:
+        csv_read = csv.reader(login_file)
+        for row in csv_read:
+            stored_logins.append(row)
+    
+    new_logins = []
+    
+    stored_service = ''
+    stored_username = ''
+    stored_password = ''
+
+    for row in stored_logins:
+        if row[0] == update_frame_service_combobox.get():
+            stored_service = row[0]
+            stored_username = row[1]
+            stored_password = row[2]
+            continue
+        else:
+            new_logins.append(row)
+
+    if update_frame_what_combobox.get() == 'Password':
+        new_login_row = [stored_service, stored_username, update_frame_new_entry.get()]
+    elif update_frame_what_combobox.get() == 'Username':
+        new_login_row = [stored_service, update_frame_new_entry.get(), stored_password]
+    elif update_frame_what_combobox.get() == 'Service':
+        new_login_row = [update_frame_new_entry.get(), stored_username, stored_password]
+    
+    new_logins.append(new_login_row)
+
+    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'w', newline='') as login_file:
+        csv_writer = csv.writer(login_file)
+        csv_writer.writerows(new_logins)
+
+    
+    
+
+    
 
 
 # MASTER
@@ -305,6 +368,37 @@ delete_frame_submit_button.grid(row=4, column=1, pady=15)
 
 # UPDATE INFO APP
 
+update_frame = tk.Frame(master=login_app, borderwidth=5, relief='solid')
+
+update_frame_title_label = tk.Label(master=update_frame, text='Update Login Info', font=('Arial Bold', 25))
+update_frame_wherefrom_label = tk.Label(master=update_frame, text='What do you need to update?')
+update_frame_what_combobox = ttk.Combobox(master=update_frame, values=['Service', 'Username', 'Password'])
+update_frame_from_lable = tk.Label(master=update_frame, text='For which Service?')
+update_frame_service_combobox = ttk.Combobox(master=update_frame)
+update_frame_service_combobox['values'] = get_service_list()
+update_frame_enter_new_label = tk.Label(master=update_frame, text='Enter new Service/Username/Password:')
+update_frame_new_entry = tk.Entry(master=update_frame, width=30)
+update_frame_update_info_button = tk.Button(master=update_frame,text='Update Info:')
+update_frame_titlescreen_button = tk.Button(master=update_frame,text='Return to Title Screen')
+update_frame_correct_label = tk.Label(master=update_frame, text='Does this look correct?')
+update_frame_confirm_label = tk.Label(master=update_frame, text='New Password: Password')
+update_frame_yes_button = tk.Button(master=update_frame, text='Yes')
+update_frame_no_button = tk.Button(master=update_frame, text='No')
+update_frame_placeholder = tk.Frame(master=update_frame)
+
+
+update_frame_title_label.grid(row=0, column=1, padx=100)
+update_frame_wherefrom_label.grid(row=1, column=1)
+update_frame_what_combobox.grid(row=2, column=1)
+update_frame_from_lable.grid(row=3, column=1)
+update_frame_service_combobox.grid(row=4, column=1)
+update_frame_enter_new_label.grid(row=5, column=1)
+update_frame_new_entry.grid(row=6, column=1)
+update_frame_update_info_button.grid(row=7, column=1)
+update_frame_titlescreen_button.grid(row=0, column=0)
+update_frame_placeholder.grid(row=0, column=2, padx=56)
+
+
 
 
 # buttons that must come at the end so that all varialbes exist
@@ -318,6 +412,9 @@ delete_frame_submit_button['command'] = intial_delete_button
 delete_frame_no_button['command'] = delete_no_go_back
 delete_frame_yes_button['command'] = delete_login_from_csv
 delete_frame_titlescreen_button['command'] = return_to_title_screen
-
+update_frame_titlescreen_button['command'] = return_to_title_screen
+update_frame_update_info_button['command'] = update_button
+update_frame_no_button['command'] = update_no_button
+update_frame_yes_button['command'] = update_yes_button
 
 login_app.mainloop()
