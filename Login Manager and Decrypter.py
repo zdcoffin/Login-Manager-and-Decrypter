@@ -4,7 +4,7 @@ from tkinter import ttk
 import csv
 
 
-
+# creates a dummy csv file for testing
 def create_csv():
     headers = ['Service', 'Username', 'Password']
     test_logins = [['Hulu', 'Huluusername', 'Hulupassword'], ['Netflix', 'Netflixusername', 'Netflixpassword'], ['Disney+', 'Disney+username', 'Disney+password'], ['Amazon Prime', 'Amazonusername', 'Amazonpassword']]
@@ -13,7 +13,7 @@ def create_csv():
         csv_writer.writerow(headers)
         csv_writer.writerows(test_logins)
 
-
+# add app, when you hit the initial submit button, it loads a series of labels that show you the info you submitted, also loads the final yes and no button to actually submit the information to the csv
 def submit_login_command():
     add_frame_confirm_label.grid(row=4, column=1)
     add_frame_service_confirm.grid(row=5, column=1)
@@ -30,7 +30,7 @@ def submit_login_command():
     add_frame_username_confirm['text'] = 'Username:    ' + new_username
     add_frame_password_confirm['text'] = 'Password:    ' + new_password
 
-
+# add app, actually submits the login info to add it to the csv file
 def add_are_you_sure_yes():
     new_service = add_frame_service_entry.get()
     new_username = add_frame_username_entry.get()
@@ -50,7 +50,7 @@ def add_are_you_sure_yes():
     add_frame_confirm_no_button.grid_remove()
     add_frame_confirm_yes_button.grid_remove()
 
-
+# add app, removes the confirmation labels and resets the page, does not submit info to the csv file
 def add_are_you_sure_no():
     add_frame_confirm_label.grid_remove()
     add_frame_service_confirm.grid_remove()
@@ -64,27 +64,7 @@ def add_are_you_sure_no():
     add_frame_password_entry.delete(0, tk.END)
 
 
-def delete_login_from_csv(service_to_delete):
-    
-    stored_logins = []
-    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r', newline='') as login_file:
-        csv_read = csv.reader(login_file)
-        for row in csv_read:
-            stored_logins.append(row)
-    
-    new_logins = []
-
-    for row in stored_logins:
-        if row[0] == service_to_delete:
-            continue
-        else:
-            new_logins.append(row)
-
-    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'w', newline='') as login_file:
-        csv_writer = csv.writer(login_file)
-        csv_writer.writerows(new_logins)
-    
-
+# aquires only the list of services from the csv, used in multiple apps
 def get_service_list():
     with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r') as login_file:
         corrected_login_file = csv.reader(login_file)
@@ -98,7 +78,7 @@ def get_service_list():
             service_list.append(info[0])
     return service_list
 
-
+# retrieve app, generates the username and password of the service selected from the combo box
 def generate_info_button_commmand():
     with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r') as login_file:
         corrected_login_file = csv.reader(login_file)
@@ -116,7 +96,7 @@ def generate_info_button_commmand():
         retrieve_frame__return_username_label['text'] = username
         retrieve_frame_return_password_label['text'] = password
 
-
+# used for all apps, returns you to the orignal app selection screen
 def return_to_title_screen():
     retrieve_frame.grid_remove()
     add_frame.grid_remove()
@@ -124,7 +104,7 @@ def return_to_title_screen():
     update_frame.grid_remove()
     checkbox_frame.pack()
 
-
+# loads the selected app from the checked box, and gives you an error message if you try to load more than one
 def checkbox_button_command():
     total_checks = retrieve_var.get() + add_var.get() + delete_var.get() + update_var.get()
     if total_checks > 1:
@@ -142,7 +122,7 @@ def checkbox_button_command():
         checkbox_frame.pack_forget()
         update_frame.grid()
 
-
+# delete app, is the final button to delete a service from the csv list, takes the selected service from the combo box, and deletes that from the csv file
 def delete_login_from_csv():
     
     service_to_delete = delete_frame_selected_service.get()
@@ -169,19 +149,19 @@ def delete_login_from_csv():
     delete_frame_no_button.grid_forget()
     delete_frame_yes_button.grid_forget()
 
-
+# delete app, the first delete service info button, which loads the actual delete button and confirmation info
 def intial_delete_button():
     delete_frame_are_you_sure.grid(row=5, column=1, pady=20, padx=30)
     delete_frame_no_button.grid(row=6, column=1)
     delete_frame_yes_button.grid(row=7, column=1)
 
-
+# delete app, resets the delete page if you choose no to go ahead with deletion 
 def delete_no_go_back():
     delete_frame_are_you_sure.grid_forget()
     delete_frame_no_button.grid_forget()
     delete_frame_yes_button.grid_forget()
 
-
+# update app, is the initial update button, that when pressed, loads the confirmation labels and the actual yes and no buttons
 def update_button():
     update_frame_correct_label.grid(row=8, column=1)
     update_frame_confirm_label.grid(row=9, column=1)
@@ -190,14 +170,14 @@ def update_button():
 
     update_frame_confirm_label['text'] = 'New ' + update_frame_what_combobox.get() + ': ' + update_frame_new_entry.get()
 
-
+# update app, resets the update app if you do not decide to go ahead with updating the info
 def update_no_button():
     update_frame_correct_label.grid_remove()
     update_frame_confirm_label.grid_remove()
     update_frame_yes_button.grid_remove()
     update_frame_no_button.grid_remove()
 
-
+# update app, the actual update info button after youve seen the confirmation labels
 def update_yes_button():
 
     stored_logins = []
