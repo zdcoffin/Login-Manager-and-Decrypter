@@ -91,7 +91,8 @@ def add_are_you_sure_yes():
     new_service = add_frame_service_entry.get()
     new_username = add_frame_username_entry.get()
     new_password = add_frame_password_entry.get()
-    new_login = [new_service, new_username, new_password]
+    encrypted_password = fer.encrypt(new_password.encode()).decode()
+    new_login = [new_service, new_username, encrypted_password]
     with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'a', newline='') as login_file:
         csv_writer = csv.writer(login_file)
         csv_writer.writerow(new_login)
@@ -148,9 +149,10 @@ def generate_info_button_commmand():
             if info[0] == retrieve_frame_selected_service:
                 username = info[1]
                 password = info[2]
+                decrypted_password = fer.decrypt(password.encode()).decode()
 
         retrieve_frame__return_username_label['text'] = username
-        retrieve_frame_return_password_label['text'] = password
+        retrieve_frame_return_password_label['text'] = decrypted_password
 
 # used for all apps, returns you to the orignal app selection screen
 def return_to_title_screen():
@@ -259,7 +261,9 @@ def update_yes_button():
             new_logins.append(row)
 
     if update_frame_what_combobox.get() == 'Password':
-        new_login_row = [stored_service, stored_username, update_frame_new_entry.get()]
+        decrypted_password = update_frame_new_entry.get()
+        encrypted_password = fer.encrypt(decrypted_password.encode()).decode()
+        new_login_row = [stored_service, stored_username, encrypted_password]
     elif update_frame_what_combobox.get() == 'Username':
         new_login_row = [stored_service, update_frame_new_entry.get(), stored_password]
     elif update_frame_what_combobox.get() == 'Service':
