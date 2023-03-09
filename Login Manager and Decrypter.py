@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 import csv
+from cryptography.fernet import Fernet
 
 
 # creates a dummy csv file for testing
@@ -12,6 +13,61 @@ def create_csv():
         csv_writer = csv.writer(login_file)
         csv_writer.writerow(headers)
         csv_writer.writerows(test_logins)
+
+# generates and writes the crytography key to a key file on the desktop, !!Only use one time!!
+def write_key():
+    key = Fernet.generate_key()
+    with open(r'C:\Users\zcoff\OneDrive\Desktop\key.key', "wb") as key_file:
+        key_file.write(key)
+
+
+# reads and returns the cryptography key
+def load_key():
+    with open(r'C:\Users\zcoff\OneDrive\Desktop\key.key', "rb") as key_file:
+        key = key_file.read()
+        return key
+
+
+# grabs the returned key and saves it to the key variable, then creates the fer variable with the key that will be used to encrypt and decrypt the passwords
+key = load_key()
+fer = Fernet(key)
+
+
+# variation on the function that creates the test login info csv, but corrected to encrypt the passwords
+def write_test_csv():
+    headers = ['Service', 'Username', 'Password']
+    test_logins = [['Hulu', 'Huluusername', 'Hulupassword'], ['Netflix', 'Netflixusername', 'Netflixpassword'], ['Disney+', 'Disney+username', 'Disney+password'], ['Amazon Prime', 'Amazonusername', 'Amazonpassword']]
+    
+    for count in range(len(test_logins)):
+        password = test_logins[count][2]
+        encrypted_password = fer.encrypt(password.encode()).decode()
+        test_logins[count][2] = encrypted_password
+
+
+    with open('encrypt_test.csv', 'w', newline='') as login_file:
+        csv_writer = csv.writer(login_file)
+        csv_writer.writerow(headers)
+        csv_writer.writerows(test_logins)
+
+
+# reads the new encrypted password test info csv and returns the login list with decrypted passwords
+def read_test():
+        with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\encrypt_test.csv', 'r') as login_file:
+            corrected_login_file = csv.reader(login_file)
+            login_list = []
+            for line in corrected_login_file:
+                login_list.append(line)
+        
+        for count in range(len(login_list)):
+            if count == 0:
+                continue
+            else:
+                password = login_list[count][2]
+                decrypted_password = fer.decrypt(password.encode()).decode()
+                login_list[count][2] = decrypted_password
+
+        return login_list
+
 
 # add app, when you hit the initial submit button, it loads a series of labels that show you the info you submitted, also loads the final yes and no button to actually submit the information to the csv
 def submit_login_command():
