@@ -3,27 +3,56 @@ from tkinter import *
 from tkinter import ttk
 import csv
 from cryptography.fernet import Fernet
+import os
 
 
-# creates a dummy csv file for testing
-def create_csv():
-    headers = ['Service', 'Username', 'Password']
-    test_logins = [['Hulu', 'Huluusername', 'Hulupassword'], ['Netflix', 'Netflixusername', 'Netflixpassword'], ['Disney+', 'Disney+username', 'Disney+password'], ['Amazon Prime', 'Amazonusername', 'Amazonpassword']]
-    with open('test_login_info.csv', 'w', newline='') as login_file:
-        csv_writer = csv.writer(login_file)
-        csv_writer.writerow(headers)
-        csv_writer.writerows(test_logins)
+# gets the users username so the program is able to find the correct file path
+os_username = os.getlogin()
+
+# function that checks to see if the users desktop is through OneDrive or is on a older windows OS
+def find_path():
+    tf = os.path.exists(rf"C:\Users\{os_username}\OneDrive\Desktop")
+
+    if tf == True:
+        return rf"C:\Users\{os_username}\OneDrive\Desktop"
+    elif tf == False:
+        return rf"C:\Users\{os_username}\Desktop"
+
+# gets the correct path for the current user for either the csv or key  
+correct_path = find_path()
+csv_path = correct_path + '\Login_Info.csv'
+key_path = correct_path + '\DONOTDELETE_Login_Key.key'
+
+
+# if file does not exist, creates csv file and adds headers
+def check_for_headers():
+    tf = os.path.exists(csv_path)
+    if tf == False:
+        headers = ['Service', 'Username', 'Password']
+        with open(csv_path, 'w', newline='') as login_file:
+            csv_writer = csv.writer(login_file)
+            csv_writer.writerow(headers)
+    else:
+        return "Headers exist already."
+
+check_for_headers()
+        
 
 # generates and writes the crytography key to a key file on the desktop, !!Only use one time!!
 def write_key():
-    key = Fernet.generate_key()
-    with open(r'C:\Users\zcoff\OneDrive\Desktop\key.key', "wb") as key_file:
-        key_file.write(key)
+    tf = os.path.exists(key_path)
+    if tf == True:
+        return "Key already exists."
+    else:
+        key = Fernet.generate_key()
+        with open(key_path, "wb") as key_file:
+            key_file.write(key)
 
+write_key()
 
 # reads and returns the cryptography key
 def load_key():
-    with open(r'C:\Users\zcoff\OneDrive\Desktop\key.key', "rb") as key_file:
+    with open(key_path, "rb") as key_file:
         key = key_file.read()
         return key
 
@@ -93,7 +122,7 @@ def add_are_you_sure_yes():
     new_password = add_frame_password_entry.get()
     encrypted_password = fer.encrypt(new_password.encode()).decode()
     new_login = [new_service, new_username, encrypted_password]
-    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'a', newline='') as login_file:
+    with open(csv_path, 'a', newline='') as login_file:
         csv_writer = csv.writer(login_file)
         csv_writer.writerow(new_login)
     add_frame_service_entry.delete(0, tk.END)
@@ -123,7 +152,7 @@ def add_are_you_sure_no():
 
 # aquires only the list of services from the csv, used in multiple apps
 def get_service_list():
-    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r') as login_file:
+    with open(csv_path, 'r') as login_file:
         corrected_login_file = csv.reader(login_file)
 
         login_list = []
@@ -137,7 +166,7 @@ def get_service_list():
 
 # retrieve app, generates the username and password of the service selected from the combo box
 def generate_info_button_commmand():
-    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r') as login_file:
+    with open(csv_path, 'r') as login_file:
         corrected_login_file = csv.reader(login_file)
         login_list = []
         for line in corrected_login_file:
@@ -186,7 +215,7 @@ def delete_login_from_csv():
     service_to_delete = delete_frame_selected_service.get()
 
     stored_logins = []
-    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r', newline='') as login_file:
+    with open(csv_path, 'r', newline='') as login_file:
         csv_read = csv.reader(login_file)
         for row in csv_read:
             stored_logins.append(row)
@@ -199,7 +228,7 @@ def delete_login_from_csv():
         else:
             new_logins.append(row)
 
-    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'w', newline='') as login_file:
+    with open(csv_path, 'w', newline='') as login_file:
         csv_writer = csv.writer(login_file)
         csv_writer.writerows(new_logins)
 
@@ -240,7 +269,7 @@ def update_yes_button():
 
     stored_logins = []
 
-    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'r', newline='') as login_file:
+    with open(csv_path, 'r', newline='') as login_file:
         csv_read = csv.reader(login_file)
         for row in csv_read:
             stored_logins.append(row)
@@ -271,7 +300,7 @@ def update_yes_button():
     
     new_logins.append(new_login_row)
 
-    with open(r'C:\Users\zcoff\OneDrive\Desktop\CSVs\test_login_info.csv', 'w', newline='') as login_file:
+    with open(csv_path, 'w', newline='') as login_file:
         csv_writer = csv.writer(login_file)
         csv_writer.writerows(new_logins)
 
